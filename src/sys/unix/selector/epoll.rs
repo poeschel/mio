@@ -1,6 +1,6 @@
 use crate::{Interest, Token};
 
-use libc::{EPOLLET, EPOLLIN, EPOLLOUT, EPOLLRDHUP};
+use libc::{EPOLLET, EPOLLIN, EPOLLOUT, EPOLLPRI, EPOLLRDHUP};
 use log::error;
 use std::os::unix::io::{AsRawFd, RawFd};
 #[cfg(debug_assertions)]
@@ -167,7 +167,7 @@ impl Drop for Selector {
 }
 
 fn interests_to_epoll(interests: Interest) -> u32 {
-    let mut kind = EPOLLET;
+    let mut kind = EPOLLET | EPOLLPRI;
 
     if interests.is_readable() {
         kind = kind | EPOLLIN | EPOLLRDHUP;
