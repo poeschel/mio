@@ -33,6 +33,8 @@ const AIO: u8 = 0b0100;
 #[cfg_attr(not(target_os = "freebsd"), allow(dead_code))]
 const LIO: u8 = 0b1000;
 
+const PRIORITY: u8 = 0b10000;
+
 impl Interest {
     /// Returns a `Interest` set representing readable interests.
     pub const READABLE: Interest = Interest(unsafe { NonZeroU8::new_unchecked(READABLE) });
@@ -52,6 +54,9 @@ impl Interest {
     /// Returns a `Interest` set representing LIO completion interests.
     #[cfg(target_os = "freebsd")]
     pub const LIO: Interest = Interest(unsafe { NonZeroU8::new_unchecked(LIO) });
+
+    /// Returns a `Interest` set representing priority interests.
+    pub const PRIORITY: Interest = Interest(unsafe { NonZeroU8::new_unchecked(PRIORITY) });
 
     /// Add together two `Interest`.
     ///
@@ -113,6 +118,11 @@ impl Interest {
     pub const fn is_lio(self) -> bool {
         (self.0.get() & LIO) != 0
     }
+
+    /// Returns true if `Interest` contains PRIORITY readiness
+    pub const fn is_priority(self) -> bool {
+        (self.0.get() & PRIORITY) != 0
+    }
 }
 
 impl ops::BitOr for Interest {
@@ -172,6 +182,13 @@ impl fmt::Debug for Interest {
                 write!(fmt, "LIO")?;
                 one = true
             }
+        }
+        if self.is_priority() {
+            if one {
+                write!(fmt, " | ")?
+            }
+            write!(fmt, "PRIORITY")?;
+            one = true
         }
         debug_assert!(one, "printing empty interests");
         Ok(())

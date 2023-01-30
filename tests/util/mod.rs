@@ -130,6 +130,9 @@ impl From<Interest> for Readiness {
         if interests.is_lio() {
             readiness.0 |= LIO;
         }
+        if interests.is_priority() {
+            readiness.0 |= PRIORITY;
+        }
         readiness
     }
 }

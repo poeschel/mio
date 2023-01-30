@@ -832,7 +832,11 @@ fn pollpri() {
 
     let (mut sock, _) = listener.accept().unwrap();
     poll.registry()
-        .register(&mut sock, Token(1), Interest::READABLE)
+        .register(
+            &mut sock,
+            Token(1),
+            Interest::READABLE.add(Interest::PRIORITY),
+        )
         .unwrap();
 
     // MsgFlags::MSG_OOB sends a tcp packet which is received by linux kernel with
@@ -841,6 +845,6 @@ fn pollpri() {
     expect_events(
         &mut poll,
         &mut events,
-        vec![ExpectEvent::new(Token(1), Readiness::PRIORITY)],
+        vec![ExpectEvent::new(Token(1), Interest::PRIORITY)],
     );
 }
